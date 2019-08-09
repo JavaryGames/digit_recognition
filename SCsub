@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+Import('env')
+Import('env_modules')
+
+env_dr = env_modules.Clone()
+
+env_dr.add_source_files(env.modules_sources, "*.cpp")
+env_dr.add_source_files(env.modules_sources, "lib/src/*.cpp")
+
+env_dr.Append(CPPPATH=["lib/include"])

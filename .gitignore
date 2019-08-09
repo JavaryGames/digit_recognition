@@ -1,0 +1,4 @@
+# Compiled
+*.pyc
+**/__pycache__
+*.o
