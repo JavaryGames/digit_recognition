@@ -32,7 +32,7 @@ NeuralNetwork::NeuralNetwork(int numInput, int numHidden, int numOutput, double 
 // Query the neural network
 // queryInput - the vector of input to the neural net
 // Saves the output to this->hiddenToOut.output
-void NeuralNetwork::query(std::vector<double> queryInput) {
+Matrix<double> NeuralNetwork::query(std::vector<double> queryInput) {
 	// Set the input to column vector - necessary in order to appropriately perform matrix multiplication
     Matrix<double> qi;
     qi.push_back(queryInput);
@@ -43,6 +43,7 @@ void NeuralNetwork::query(std::vector<double> queryInput) {
     this->inputToHidden.computeOutput();
     this->hiddenToOutput.setInput(inputToHidden.getOutput());
     this->hiddenToOutput.computeOutput();
+    return this->hiddenToOutput.getOutput();
 }
 
 // Train the network for one input

@@ -20,7 +20,7 @@ public:
 	NeuralNetwork(int numInput, int numHidden, int numOutput, double learningRate);
     
 	// Query Functions
-	void query(std::vector<double>);
+	Matrix<double> query(std::vector<double>);
     bool test(int ans, std::vector<double>);
     
     // Training Functions
