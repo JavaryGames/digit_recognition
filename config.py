@@ -1,9 +1,9 @@
-import os
 
 def can_build(env, platform):
     return True
 
 def data_header_builder(target, source, env):
+    import os
     for f in source:
         source_file = open(str(f), "r")
         target_file = open(str(f) + ".gen.h", "w")
