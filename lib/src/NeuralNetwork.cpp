@@ -179,17 +179,24 @@ void NeuralNetwork::serialize(std::string file) {
 // The exact reverse operations as NeuralNetwork::serialize method
 void NeuralNetwork::deserialize(std::string file) {
     using namespace std;
+    ifstream fin (file);
+
+    if (!fin.is_open()) {
+        cout << "Error opening file " << file << endl;
+        return;
+    }
+    deserialize(fin);
+    fin.close();
+}
     
+void NeuralNetwork::deserialize(std::istream &fin) {
+    using namespace std;
+
     double learningRate = 0.3; // Default
     Matrix<double> i2h;
     Matrix<double> h2o;
     
     string line;
-    ifstream fin (file);
-    
-    if (!fin.is_open()) {
-        cout << "Error opening file " << file << endl;
-    }
     
     // First get the learning rate
     while (getline(fin, line)) {
@@ -222,7 +229,6 @@ void NeuralNetwork::deserialize(std::string file) {
         }
         row++;
     }
-    fin.close();
     
     // Set the instance variables
     this->lRate = learningRate;

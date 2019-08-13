@@ -31,4 +31,5 @@ public:
     // Serialization
     void serialize(std::string file);
     void deserialize(std::string file);
+	void deserialize(std::istream &fin);
 };

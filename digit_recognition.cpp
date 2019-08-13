@@ -2,26 +2,25 @@
 
 #include "core/project_settings.h"
 
+#include "data/knowledge.knw.gen.h"
+
 #include <vector>
+#include <string>
+#include <sstream>
 
 void DigitRecognition::_bind_methods() {
     ClassDB::bind_method(D_METHOD("recognize", "pixels"), &DigitRecognition::recognize);
-    ClassDB::bind_method(D_METHOD("get_knowledge_path"), &DigitRecognition::get_knowledge_path);
-    ClassDB::bind_method(D_METHOD("set_knowledge_path", "path"), &DigitRecognition::set_knowledge_path);
-
-    ADD_PROPERTY(PropertyInfo(Variant::STRING, "knowledge_path"), "set_knowledge_path", "get_knowledge_path");
 }
 
 int DigitRecognition::recognize(const PoolByteArray &p_pixels) {
 
-    ERR_FAIL_COND_V(knowledge_path.empty(), -1);
+    ERR_FAIL_COND_V(p_pixels.size() != 28 * 28, -1);
 
     std::vector<double> input;
     input.resize(p_pixels.size());
 
     for (int i = 0; i < p_pixels.size(); i++) {
         input[i] = (((255 - p_pixels[i]) / 255.0 * 0.99) + 0.01); //make input from range 0.01-0.99;
-        // print_line("digit " + itos(i) + " is " + itos(p_pixels[i]) + " and " + rtos(input[i]));
     }
 
     Matrix<double> results = nn.query(input);
@@ -36,19 +35,11 @@ int DigitRecognition::recognize(const PoolByteArray &p_pixels) {
 		}
 	}
 
-    print_line("Trying to recognize " + itos(p_pixels.size()));
     return answerIndex;
 }
 
-String DigitRecognition::get_knowledge_path() const {
-    return knowledge_path;
+DigitRecognition::DigitRecognition() {
+    using namespace std;
+    stringstream stream(KNOWLEDGE);
+    nn.deserialize(stream);
 }
-
-void DigitRecognition::set_knowledge_path(const String &p_path) {
-    knowledge_path = p_path;
-    String globalized = ProjectSettings::get_singleton()->globalize_path(p_path);
-    // print_line("globalized is " + globalized);
-    nn.deserialize(std::string(globalized.utf8().get_data()));
-}
-
-DigitRecognition::DigitRecognition() {}
