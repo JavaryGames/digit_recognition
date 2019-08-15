@@ -1,4 +1,5 @@
 #include "digit_recognition.h"
+#include "draw_rect.h"
 
 #include "core/class_db.h"
 #include "core/engine.h"
@@ -10,6 +11,8 @@ void register_digit_recognition_types() {
     dr_singleton = memnew(DigitRecognition);
 
     Engine::get_singleton()->add_singleton(Engine::Singleton("DigitRecognition", dr_singleton));
+
+    ClassDB::register_class<DrawRect>();
 }
 
 void unregister_digit_recognition_types() {
