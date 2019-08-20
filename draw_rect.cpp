@@ -70,7 +70,7 @@ void DrawRect::reset_last_point() {
 
 void DrawRect::update_extents(const Vector2 &p_point) {
     if (extents_min.get_type() == Variant::NIL) {
-        extents_min = Vector2(get_rect().position);
+        extents_min = Vector2(get_rect().size);
         extents_max = Vector2();
     }
 
