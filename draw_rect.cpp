@@ -50,7 +50,7 @@ void DrawRect::_gui_input(const Ref<InputEvent> &p_event) {
 }
 
 void DrawRect::init_white() {
-    rect = Rect2(get_position(), get_size() * get_scale().x);
+    rect = Rect2(get_position(), get_size() * get_scale());
     image.instance();
     image->create(get_size().x, get_size().y, false, Image::FORMAT_RGBA8);
     image->lock();
@@ -74,8 +74,8 @@ void DrawRect::update_extents(const Vector2 &p_point) {
         extents_max = Vector2();
     }
 
-    Vector2 new_min(MIN(extents_min.operator Vector2().x, p_point.x - thickness), MIN(extents_min.operator Vector2().y, p_point.y - thickness));
-    Vector2 new_max(MAX(extents_max.operator Vector2().x, p_point.x + thickness), MAX(extents_max.operator Vector2().y, p_point.y + thickness));
+    Vector2 new_min(MAX(MIN(extents_min.operator Vector2().x, p_point.x - thickness), rect.get_position().x), MAX(MIN(extents_min.operator Vector2().y, p_point.y - thickness), rect.get_position().y));
+    Vector2 new_max(MIN(MAX(extents_max.operator Vector2().x, p_point.x + thickness), rect.get_position().x + rect.get_size().x), MIN(MAX(extents_max.operator Vector2().y, p_point.y + thickness), rect.get_position().y + rect.get_size().y));
 
     extents_min = new_min;
     extents_max = new_max;
@@ -100,7 +100,7 @@ void DrawRect::draw(const Vector2 &p_point) {
 
     for (int y = 0; y <= neighboorhood_rect.size.y; y++) {
         for (int x = 0; x <= neighboorhood_rect.size.x; x++) {
-            Vector2 neighbor_pixel = neighboorhood_rect.position + Vector2(x, y);
+            Vector2 neighbor_pixel = (neighboorhood_rect.position + Vector2(x, y)) * get_scale();
             if (!rect.has_point(neighbor_pixel)) {
                 continue;
             }
@@ -108,7 +108,10 @@ void DrawRect::draw(const Vector2 &p_point) {
             if (dist > thickness) {
                 continue;
             }
-            Vector2 image_pixel_pos = (neighbor_pixel - get_position()) / get_scale().x;
+            Vector2 image_pixel_pos = (neighbor_pixel - get_position()) / get_scale();
+            if (image_pixel_pos.x < 0 || image_pixel_pos.y < 0 || image_pixel_pos.x >= image->get_size().x || image_pixel_pos.y >= image->get_size().y) {
+                continue;
+            }
             image->set_pixelv(image_pixel_pos, black);
         }
     }
@@ -124,10 +127,10 @@ void DrawRect::draw_line_to(const Vector2 &p_final_point) {
 
     Color black(0, 0, 0, 1);
 
-    Vector2 normalized_vector = (p_final_point - last_point).normalized() / 2.0;
+    Vector2 normalized_vector = (p_final_point - last_point).normalized() / get_scale();
     image->lock();
-    Vector2 offset = normalized_vector.tangent() * 2 * thickness;
-    while (offset.distance_to(-normalized_vector.tangent() * 2 * thickness) > 1) {
+    Vector2 offset = normalized_vector.tangent() * get_scale() * thickness;
+    while (offset.distance_to(-normalized_vector.tangent() * get_scale() * thickness) > 1) {
         offset -= normalized_vector.tangent();
 		Vector2 delta = last_point;
         while (delta.distance_to(p_final_point) > 1) {
@@ -136,7 +139,10 @@ void DrawRect::draw_line_to(const Vector2 &p_final_point) {
             if (!rect.has_point(pixel_pos)) {
                 continue;
             }
-            Vector2 image_pixel_pos = (pixel_pos - get_position()) / get_scale().x;
+            Vector2 image_pixel_pos = (pixel_pos - get_position());
+            if (pixel_pos.x < 0 || pixel_pos.y < 0 || pixel_pos.x >= image->get_size().x || pixel_pos.y >= image->get_size().y) {
+                continue;
+            }
 			image->set_pixelv(image_pixel_pos, black);
         }
     }
