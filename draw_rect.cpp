@@ -53,7 +53,7 @@ void DrawRect::init_white() {
     rect = Rect2(get_position(), get_size() * get_scale());
     image.instance();
     image->create(get_size().x, get_size().y, false, Image::FORMAT_RGBA8);
-    image->lock();
+    image->lock(); 
     image->fill(Color(1, 1, 1, 0));
     image->unlock();
 
@@ -162,7 +162,7 @@ void DrawRect::on_parent_resized() {
     Ref<ImageTexture> texture;
     texture.instance();
 	set_texture(texture);
-	set_size(parent->get_size());
+	set_size(parent->get_size() / get_scale());
 	init_white();
 }
 
