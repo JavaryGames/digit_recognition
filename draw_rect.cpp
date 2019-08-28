@@ -15,10 +15,13 @@ void DrawRect::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_extents_min", "extents"), &DrawRect::set_extents_min);
     ClassDB::bind_method(D_METHOD("get_extents_max"), &DrawRect::get_extents_max);
     ClassDB::bind_method(D_METHOD("set_extents_max", "extents"), &DrawRect::set_extents_max);
+    ClassDB::bind_method(D_METHOD("get_line_color"), &DrawRect::get_line_color);
+    ClassDB::bind_method(D_METHOD("set_line_color", "color"), &DrawRect::set_line_color);
 
     ADD_PROPERTY(PropertyInfo(Variant::INT, "thickness"), "set_thickness", "get_thickness");
     ADD_PROPERTY(PropertyInfo(Variant::NIL, "extents_min"), "set_extents_min", "get_extents_min");
     ADD_PROPERTY(PropertyInfo(Variant::NIL, "extents_max"), "set_extents_max", "get_extents_max");
+    ADD_PROPERTY(PropertyInfo(Variant::COLOR, "line_color"), "set_line_color", "get_line_color");
 
     ADD_SIGNAL(MethodInfo("started_drawing"));
     ADD_SIGNAL(MethodInfo("stopped_drawing"));
@@ -96,7 +99,6 @@ void DrawRect::draw(const Vector2 &p_point) {
     Rect2 neighboorhood_rect = Rect2(p_point - Vector2(thickness, thickness), Vector2(2*thickness, 2*thickness));
 
     image->lock();
-    Color black(0, 0, 0, 1);
 
     for (int y = 0; y <= neighboorhood_rect.size.y; y++) {
         for (int x = 0; x <= neighboorhood_rect.size.x; x++) {
@@ -112,7 +114,7 @@ void DrawRect::draw(const Vector2 &p_point) {
             if (image_pixel_pos.x < 0 || image_pixel_pos.y < 0 || image_pixel_pos.x >= image->get_size().x || image_pixel_pos.y >= image->get_size().y) {
                 continue;
             }
-            image->set_pixelv(image_pixel_pos, black);
+            image->set_pixelv(image_pixel_pos, line_color);
         }
     }
     image->unlock();
@@ -124,8 +126,6 @@ void DrawRect::draw_line_to(const Vector2 &p_final_point) {
     if ((p_final_point - last_point).length() == 0) {
         return;
     }
-
-    Color black(0, 0, 0, 1);
 
     Vector2 normalized_vector = (p_final_point - last_point).normalized() / get_scale();
     image->lock();
@@ -143,7 +143,7 @@ void DrawRect::draw_line_to(const Vector2 &p_final_point) {
             if (pixel_pos.x < 0 || pixel_pos.y < 0 || pixel_pos.x >= image->get_size().x || pixel_pos.y >= image->get_size().y) {
                 continue;
             }
-			image->set_pixelv(image_pixel_pos, black);
+			image->set_pixelv(image_pixel_pos, line_color);
         }
     }
     image->unlock();
@@ -172,6 +172,7 @@ DrawRect::DrawRect() {
     extents_max = Variant();
     extents_min = Variant();
     thickness = 20;
+    line_color = Color(0,0,0,1.0F);
     image.instance();
     Ref<ImageTexture> texture;
     texture.instance();

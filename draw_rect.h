@@ -9,6 +9,7 @@ class DrawRect : public TextureRect {
 protected:
 
     int thickness;
+    Color line_color;
 
     Ref<Image> image;
     Rect2 rect;
@@ -36,6 +37,8 @@ public:
     Variant get_extents_min() const { return extents_min; }
     void set_extents_max(Variant p_extents) { extents_max = p_extents; }
     Variant get_extents_max() const { return extents_max; }
+    void set_line_color(Color p_color) { line_color = p_color; }
+    Color get_line_color() const { return line_color; }
 
     DrawRect();
 };
