@@ -7,6 +7,7 @@
 #define NUM_DIGITS 10
 #include "../include/NeuralNetwork.h"
 #include <string>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -37,7 +38,7 @@ Matrix<double> NeuralNetwork::query(std::vector<double> queryInput) {
     Matrix<double> qi;
     qi.push_back(queryInput);
     qi = MM::transpose(qi);
-    
+
     // Feed forward through neural net
     this->inputToHidden.setInput(qi);
     this->inputToHidden.computeOutput();
@@ -70,10 +71,10 @@ void NeuralNetwork::backpropagation(int answer, Matrix<double> tOut) {
 			outputError.push_back({ 0.01 - tOut[i][0] });
 		}
 	}
-    
+
 	// Calculate the error for hidden layer
 	Matrix<double> hiddenError =  MM::transpose(this->hiddenToOutput.getWeights()) * outputError;
-    
+
 	//adjust the weights using the error calculated
 	this->adjustWeights(outputError, hiddenError);
 }
@@ -123,11 +124,11 @@ bool NeuralNetwork::test(int ans, std::vector<double> input) {
 			max = results[i][0];
 		}
 	}
-    
+
     // Compare the answer to the answer given
 	if (answerIndex == (size_t) ans)
         return true;
-    
+
 	return false;
 }
 
@@ -136,22 +137,22 @@ bool NeuralNetwork::test(int ans, std::vector<double> input) {
 // This method will completely overwrite an existing file
 void NeuralNetwork::serialize(std::string file) {
     using namespace std;
-    
+
     Matrix<double> i2h = this->inputToHidden.getWeights();
     Matrix<double> h2o = this->hiddenToOutput.getWeights();
-    
+
     // Open file stream to write to
     ofstream fout;
     fout.open(file);
-    
+
     if (!fout.is_open()) {
         cout << "Error opening file " << file << endl;
     }
-    
+
     fout << this->lRate << endl;
     // Print one empty line in between
     fout << endl;
-    
+
     // Print input-hidden weight matrix first
     for (size_t i = 0; i < i2h.size(); i++) {
         for (size_t j = 0; j < i2h[0].size(); j++) {
@@ -162,7 +163,7 @@ void NeuralNetwork::serialize(std::string file) {
     }
     // Print one empty line in between
     fout << endl;
-    
+
     // Print hidden-output weight matrix second
     for (size_t i = 0; i < h2o.size(); i++) {
         for (size_t j = 0; j < h2o[0].size(); j++) {
@@ -171,7 +172,7 @@ void NeuralNetwork::serialize(std::string file) {
         }
         fout << endl;
     }
-    
+
     fout.close();
 }
 
@@ -188,33 +189,33 @@ void NeuralNetwork::deserialize(std::string file) {
     deserialize(fin);
     fin.close();
 }
-    
+
 void NeuralNetwork::deserialize(std::istream &fin) {
     using namespace std;
 
     double learningRate = 0.3; // Default
     Matrix<double> i2h;
     Matrix<double> h2o;
-    
+
     string line;
-    
+
     // First get the learning rate
     while (getline(fin, line)) {
         if (line.length() == 0) break;
 //        getline(fin, line);
-        learningRate = stod(line);
+        learningRate = atof(line.c_str());
     }
-    
+
     int row = 0;
     while (getline(fin, line)) {
         if (line.length() == 0) break;
         string val;
         stringstream s(line);
         i2h.push_back({});
-        
-        
+
+
         while (getline(s, val, ' ')) {
-            i2h[row].push_back(stod(val));
+            i2h[row].push_back(atof(val.c_str()));
         }
         row++;
     }
@@ -223,13 +224,13 @@ void NeuralNetwork::deserialize(std::istream &fin) {
         string val;
         stringstream s(line);
         h2o.push_back({});
-        
+
         while (getline(s, val, ' ')) {
-            h2o[row].push_back(stod(val));
+            h2o[row].push_back(atof(val.c_str()));
         }
         row++;
     }
-    
+
     // Set the instance variables
     this->lRate = learningRate;
     this->inputToHidden.setWeights(i2h);
