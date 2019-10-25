@@ -3,14 +3,14 @@
 
 #include "core/reference.h"
 
-#include "lib/include/NeuralNetwork.h"
+#include "kann/kann.h"
 
 class DigitRecognition : public Reference {
     GDCLASS(DigitRecognition, Reference);
 
 private:
 
-    NeuralNetwork nn;
+    kann_t* ann;
 
 protected:
     static void _bind_methods();

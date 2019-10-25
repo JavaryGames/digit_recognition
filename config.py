@@ -2,10 +2,10 @@
 def can_build(env, platform):
     return True
 
-def data_header_builder(target, source, env):
+def binary_data_header_builder(target, source, env):
     import os
     for f in source:
-        source_file = open(str(f), "r")
+        source_file = open(str(f), "rb")
         target_file = open(str(f) + ".gen.h", "w")
 
         target_file.write("/* WARNING, THIS FILE WAS GENERATED, DO NOT EDIT */\n")
@@ -15,15 +15,19 @@ def data_header_builder(target, source, env):
 
         target_file.write("""
 
-#include <string>
+const unsigned char MLP_KNOWLEDGE[] = {""")
 
-std::string KNOWLEDGE = R"KNOWLEDGE(""")
+        gen = ""
+        byte = source_file.read(1)
+        while len(byte) == 1:
+            gen += hex(ord(byte))
+            byte = source_file.read(1)
+            if (len(byte) == 1):
+                gen += ","
 
-        target_file.write(source_file.read())
-
-        target_file.write(""")KNOWLEDGE";
+        target_file.write(gen)
+        target_file.write("""};
 """)
-
         target_file.write("#endif // " + header_guard + "\n")
 
         target_file.close()
@@ -31,5 +35,5 @@ std::string KNOWLEDGE = R"KNOWLEDGE(""")
 
 def configure(env):
     env.Append(BUILDERS =
-        { "NN_KNOWLEDGE" : env.Builder(action=data_header_builder, suffix=".knw.gen.h", src_suffix=".knw") }
+        { "MLP_KNOWLEDGE" : env.Builder(action=binary_data_header_builder, suffix=".knw.gen.h", src_suffix=".knw") }
     )

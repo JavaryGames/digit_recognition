@@ -6,8 +6,9 @@ Import('env_modules')
 env_dr = env_modules.Clone()
 
 env_dr.add_source_files(env.modules_sources, "*.cpp")
-env_dr.add_source_files(env.modules_sources, "lib/src/*.cpp")
-env_dr.NN_KNOWLEDGE("data/knowledge.knw")
-env_dr.Append(CPPPATH=["lib/include"])
+env_dr.add_source_files(env.modules_sources, "kann/*.c")
+env_dr.add_source_files(env.modules_sources, "kann/kann_extra/*.c")
+env_dr.MLP_KNOWLEDGE("data/mnist_mlp.knw")
+env_dr.Append(CPPPATH=["kann"])
 if not env.msvc:
     env_dr.Append(CXXFLAGS=["-std=c++11"])
