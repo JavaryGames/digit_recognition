@@ -7,7 +7,8 @@ DigitRecognition.recognize(image.get_data())
 ```
 
 Where `image` is of type Image with a monochromatic format. The input
-to  recognize is essentially an array of pixels from a 28x28 image.
+to  `recognize` is essentially an array of pixels from a 28x28 image, where
+each pixel is a byte (0-255 range).
 
 This uses the [Kann](https://github.com/attractivechaos/kann) library
 to drive the neural network for the digit recognition. The
