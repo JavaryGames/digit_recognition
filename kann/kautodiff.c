@@ -1868,7 +1868,7 @@ static void conv_rot180(int d0, int d1, float *x) /* rotate/reverse a weight mar
 	for (i = 0; i < d0; ++i) {
 		float tmp, *xi = &x[i * d1];
 		for (j = 0; j < d1>>1; ++j)
-			tmp = xi[j], xi[j] = xi[d1-1-j], xi[d1-1-j] = tmp; 
+			tmp = xi[j], xi[j] = xi[d1-1-j], xi[d1-1-j] = tmp;
 	}
 }
 
@@ -2394,3 +2394,63 @@ void kad_check_grad(int n, kad_node_t **a, int from)
 	} else fprintf(stderr, "skipped\n");
 	free(delta); free(g0);
 }
+
+// ======== BEGIN JAVARY CHANGES ========
+
+// Helper functions to load from memory instead of disk
+static int fread_mem(void* target, size_t size, size_t length, int *offset, const unsigned char src[]) {
+    memcpy(target, &(src[*offset]), size * length);
+	*offset += length * size;
+    return *offset;
+}
+
+static kad_node_t *kad_load1_mem(const unsigned char mem[], kad_node_t **node, int *offset)
+{
+	kad_node_t *p;
+	p = (kad_node_t*)calloc(1, sizeof(kad_node_t));
+	fread_mem(&p->ext_label, 4, 1, offset, mem);
+	fread_mem(&p->ext_flag, 4, 1, offset, mem);
+	fread_mem(&p->flag, 1, 1, offset, mem);
+	fread_mem(&p->n_child, 4, 1, offset, mem);
+	if (p->n_child) {
+		int32_t j, k;
+		p->child = (kad_node_t**)calloc(p->n_child, sizeof(kad_node_t*));
+		fread_mem(&p->op, 2, 1, offset, mem);
+		for (j = 0; j < p->n_child; ++j) {
+			fread_mem(&k, 4, 1, offset, mem);
+			p->child[j] = node? node[k] : 0;
+		}
+		fread_mem(&k, 4, 1, offset, mem);
+		if (k >= 0) p->pre = node[k];
+		fread_mem(&p->ptr_size, 4, 1, offset, mem);
+		if (p->ptr_size > 0) {
+			p->ptr = malloc(p->ptr_size);
+			fread_mem(p->ptr, p->ptr_size, 1, offset, mem);
+		}
+	} else {
+		fread_mem(&p->n_d, 1, 1, offset, mem);
+		if (p->n_d)  fread_mem(p->d, 4, p->n_d, offset, mem);
+	}
+	return p;
+}
+
+kad_node_t **kad_load_mem(const unsigned char mem[], int *_n_node, int *offset)
+{
+	int32_t i, n_node;
+	kad_node_t **node;
+    fread_mem(&n_node, 4, 1, offset, mem);
+	node = (kad_node_t**)malloc(n_node * sizeof(kad_node_t*));
+	for (i = 0; i < n_node; ++i) {
+		kad_node_t *p;
+		p = node[i] = kad_load1_mem(mem, node, offset);
+		if (p->n_child) {
+			kad_op_list[p->op](p, KAD_ALLOC);
+			kad_op_list[p->op](p, KAD_SYNC_DIM);
+		}
+	}
+	*_n_node = n_node;
+	kad_mark_back(n_node, node);
+	return node;
+}
+
+// ======== END JAVARY CHANGES ========

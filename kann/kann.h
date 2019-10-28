@@ -228,6 +228,10 @@ void kann_save(const char *fn, kann_t *ann);
 kann_t *kann_load_fp(FILE *fp);
 kann_t *kann_load(const char *fn);
 
+// ======== BEGIN JAVARY CHANGES ========
+kann_t *kann_load_mem(const unsigned char mem[]);
+// ======== END JAVARY CHANGES ========
+
 #ifdef __cplusplus
 }
 #endif

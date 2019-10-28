@@ -102,7 +102,7 @@ void kad_delete(int n, kad_node_t **a); /* deallocate a compiled/linearized grap
 
 /**
  * Compute the value at a node
- * 
+ *
  * @param n       number of nodes
  * @param a       list of nodes
  * @param from    compute the value at this node, 0<=from<n
@@ -222,6 +222,10 @@ void kad_saxpy(int n, float a, const float *x, float *y);
 void kad_trap_fe(void); /* abort on divide-by-zero and NaN */
 void kad_print_graph(FILE *fp, int n, kad_node_t **v);
 void kad_check_grad(int n, kad_node_t **a, int from);
+
+// ======== BEGIN JAVARY CHANGES ========
+kad_node_t **kad_load_mem(const unsigned char mem[], int *_n_node, int *offset);
+// ======== END JAVARY CHANGES ========
 
 #ifdef __cplusplus
 }

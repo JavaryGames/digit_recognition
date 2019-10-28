@@ -975,3 +975,38 @@ const float *kann_apply1(kann_t *a, float *x)
 	kad_eval_at(a->n, a->v, i_out);
 	return a->v[i_out]->x;
 }
+
+
+// ======== BEGIN JAVARY CHANGES ========
+
+// Helper functions to load from memory instead of disk
+static int fread_mem(void* target, size_t size, size_t length, int *offset, const unsigned char src[]) {
+    memcpy(target, &(src[*offset]), size * length);
+	*offset += length * size;
+    return *offset;
+}
+
+kann_t *kann_load_mem(const unsigned char mem[])
+{
+	char magic[4];
+	kann_t *ann;
+	int n_var, n_const;
+	int offset = 0;
+
+	fread_mem(magic, 1, 4, &offset, mem);
+	if (strncmp(magic, KANN_MAGIC, 4) != 0) {
+		return 0;
+	}
+	ann = (kann_t*)calloc(1, sizeof(kann_t));
+	ann->v = kad_load_mem(mem, &ann->n, &offset);
+	n_var = kad_size_var(ann->n, ann->v);
+	n_const = kad_size_const(ann->n, ann->v);
+	ann->x = (float*)malloc(n_var * sizeof(float));
+	ann->g = (float*)calloc(n_var, sizeof(float));
+	ann->c = (float*)malloc(n_const * sizeof(float));
+	fread_mem(ann->x, sizeof(float), n_var, &offset, mem);
+	fread_mem(ann->c, sizeof(float), n_const, &offset, mem);
+	kad_ext_sync(ann->n, ann->v, ann->x, ann->g, ann->c);
+	return ann;
+}
+// ======== END JAVARY CHANGES ========

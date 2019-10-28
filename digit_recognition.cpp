@@ -1,3 +1,4 @@
+
 #include "digit_recognition.h"
 
 #include "core/project_settings.h"
@@ -5,8 +6,6 @@
 #include "data/mnist_mlp.knw.gen.h"
 
 #include "kann/kann.h"
-
-#include <stdio.h>
 
 void DigitRecognition::_bind_methods() {
     ClassDB::bind_method(D_METHOD("recognize", "pixels"), &DigitRecognition::recognize);
@@ -38,6 +37,5 @@ int DigitRecognition::recognize(const PoolByteArray &p_pixels) {
 }
 
 DigitRecognition::DigitRecognition() {
-    FILE* data = fmemopen((void*)MLP_KNOWLEDGE, sizeof(MLP_KNOWLEDGE), "rb");
-    ann = kann_load_fp(data);
+    ann = kann_load_mem(MLP_KNOWLEDGE);
 }
