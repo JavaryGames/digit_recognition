@@ -17,6 +17,7 @@ void DrawRect::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_extents_max", "extents"), &DrawRect::set_extents_max);
     ClassDB::bind_method(D_METHOD("get_line_color"), &DrawRect::get_line_color);
     ClassDB::bind_method(D_METHOD("set_line_color", "color"), &DrawRect::set_line_color);
+    ClassDB::bind_method(D_METHOD("get_image_binary"), &DrawRect::get_image_binary);
 
     ADD_PROPERTY(PropertyInfo(Variant::INT, "thickness"), "set_thickness", "get_thickness");
     ADD_PROPERTY(PropertyInfo(Variant::NIL, "extents_min"), "set_extents_min", "get_extents_min");
@@ -60,6 +61,12 @@ void DrawRect::init_white() {
     image->fill(Color(1, 1, 1, 0));
     image->unlock();
 
+    image_binary.instance();
+    image_binary->create(get_size().x, get_size().y, false, Image::FORMAT_RGBA8);
+    image_binary->lock(); 
+    image_binary->fill(Color(1, 1, 1, 0));
+    image_binary->unlock();
+
     Ref<ImageTexture> texture = get_texture();
     texture->create_from_image(image);
 
@@ -99,7 +106,7 @@ void DrawRect::draw(const Vector2 &p_point) {
     Rect2 neighboorhood_rect = Rect2(p_point - Vector2(thickness, thickness), Vector2(2*thickness, 2*thickness));
 
     image->lock();
-
+    image_binary->lock();
     for (int y = 0; y <= neighboorhood_rect.size.y; y++) {
         for (int x = 0; x <= neighboorhood_rect.size.x; x++) {
             Vector2 neighbor_pixel = (neighboorhood_rect.position + Vector2(x, y)) * get_scale();
@@ -115,9 +122,12 @@ void DrawRect::draw(const Vector2 &p_point) {
                 continue;
             }
             image->set_pixelv(image_pixel_pos, line_color);
+            image_binary->set_pixelv(image_pixel_pos, Color(0, 0, 0, 1));
         }
     }
     image->unlock();
+    image_binary->unlock();
+
     Ref<ImageTexture> texture = get_texture();
     texture->set_data(image);
 }
@@ -128,8 +138,10 @@ void DrawRect::draw_line_to(const Vector2 &p_final_point) {
     }
 
     Vector2 normalized_vector = (p_final_point - last_point).normalized() / get_scale();
-    image->lock();
     Vector2 offset = normalized_vector.tangent() * get_scale() * thickness;
+
+    image->lock();
+    image_binary->lock();
     while (offset.distance_to(-normalized_vector.tangent() * get_scale() * thickness) > 1) {
         offset -= normalized_vector.tangent();
 		Vector2 delta = last_point;
@@ -144,9 +156,12 @@ void DrawRect::draw_line_to(const Vector2 &p_final_point) {
                 continue;
             }
 			image->set_pixelv(image_pixel_pos, line_color);
+            image_binary->set_pixelv(image_pixel_pos, Color(0, 0, 0, 1));
         }
     }
     image->unlock();
+    image_binary->unlock();
+
     Ref<ImageTexture> texture = get_texture();
     texture->set_data(image);
 }
@@ -174,6 +189,7 @@ DrawRect::DrawRect() {
     thickness = 20;
     line_color = Color(0,0,0,1.0F);
     image.instance();
+    image_binary.instance();
     Ref<ImageTexture> texture;
     texture.instance();
     set_texture(texture);

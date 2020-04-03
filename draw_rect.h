@@ -2,16 +2,16 @@
 #define RECON_DRAW_RECT_H
 
 #include "scene/gui/texture_rect.h"
+#include <iostream>
 
 class DrawRect : public TextureRect {
     GDCLASS(DrawRect, TextureRect);
 
 protected:
-
     int thickness;
     Color line_color;
-
     Ref<Image> image;
+    Ref<Image> image_binary;
     Rect2 rect;
     bool drawing;
     Vector2 last_point;
@@ -22,7 +22,6 @@ protected:
     virtual void _gui_input(const Ref<InputEvent> &p_event);
 
 public:
-
     void init_white();
     void reset_last_point();
     void update_extents(const Vector2 &p_point);
@@ -39,6 +38,7 @@ public:
     Variant get_extents_max() const { return extents_max; }
     void set_line_color(Color p_color) { line_color = p_color; }
     Color get_line_color() const { return line_color; }
+    Ref<Image> get_image_binary() const { return image_binary; }
 
     DrawRect();
 };
