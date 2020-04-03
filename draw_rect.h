@@ -2,7 +2,6 @@
 #define RECON_DRAW_RECT_H
 
 #include "scene/gui/texture_rect.h"
-#include <iostream>
 
 class DrawRect : public TextureRect {
     GDCLASS(DrawRect, TextureRect);
