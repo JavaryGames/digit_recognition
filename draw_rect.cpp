@@ -46,6 +46,7 @@ void DrawRect::_gui_input(const Ref<InputEvent> &p_event) {
         Ref<InputEventMouseMotion> mm = iem;
         if (drawing && mm.is_valid()) {
             draw(mm->get_position());
+            emit_signal("point_drawn");
         }
         if (!drawing || !rect.has_point(iem->get_position())) {
             reset_last_point();
