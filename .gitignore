@@ -2,6 +2,7 @@
 *.pyc
 **/__pycache__
 *.o
+*.obj
 
 # Generated
 *.gen.h

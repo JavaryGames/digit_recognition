@@ -58,13 +58,13 @@ void DrawRect::init_white() {
     rect = Rect2(get_position(), get_size() * get_scale());
     image.instance();
     image->create(get_size().x, get_size().y, false, Image::FORMAT_RGBA8);
-    image->lock(); 
+    image->lock();
     image->fill(Color(1, 1, 1, 0));
     image->unlock();
 
     image_binary.instance();
     image_binary->create(get_size().x, get_size().y, false, Image::FORMAT_RGBA8);
-    image_binary->lock(); 
+    image_binary->lock();
     image_binary->fill(Color(1, 1, 1, 0));
     image_binary->unlock();
 
@@ -172,7 +172,7 @@ void DrawRect::on_parent_resized() {
     ERR_FAIL_COND(!parent);
 
     Vector2 parent_size = parent->get_size();
-	if (parent_size.x == 0.0 or parent_size.y == 0.0) {
+	if (parent_size.x == 0.0 || parent_size.y == 0.0) {
 		return;
     }
     Ref<ImageTexture> texture;
