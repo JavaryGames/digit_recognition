@@ -10,5 +10,8 @@ env_dr.add_source_files(env.modules_sources, "kann/*.c")
 env_dr.add_source_files(env.modules_sources, "kann/kann_extra/*.c")
 env_dr.MLP_KNOWLEDGE("data/mnist_mlp.knw")
 env_dr.Append(CPPPATH=["kann"])
-if not env.msvc:
-    env_dr.Append(CXXFLAGS=["-std=c++11"])
+
+## Disable forcing a C++ standard, since newer Godot versions are built
+## with -std=gnu++14. See https://github.com/godotengine/godot/issues/48479
+# if not env.msvc:
+#     env_dr.Append(CXXFLAGS=["-std=c++11"])
